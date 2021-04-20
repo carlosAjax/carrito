@@ -11,6 +11,7 @@ import { ProductoService } from 'src/app/services/producto.service';
 export class ProductListComponent implements OnInit {
   products: Producto[];
   currentIdCategory: number;
+  modoDeBusqueda : boolean;
 
   constructor(
     private productService: ProductoService,
@@ -24,6 +25,30 @@ export class ProductListComponent implements OnInit {
   }
 
   listaproductos() {
+
+    this.modoDeBusqueda = this.route.snapshot.paramMap.has("keyWord");
+
+    if(this.modoDeBusqueda){
+      this.manejadorDebusquedaDeProductos();
+    }
+    else{
+      this.manejadorDelistaDeproductos();
+
+    }
+   
+  }
+
+
+  manejadorDebusquedaDeProductos() {
+    const theKeyWord = this.route.snapshot.paramMap.get('keyWord');
+    this.productService.buscarProducto(theKeyWord).subscribe(
+      data => {
+        this.products = data;
+      }
+    );
+  }
+
+  manejadorDelistaDeproductos(){
     //verifica si el id del parametro es correcto
     const hasCategoryId: boolean = this.route.snapshot.paramMap.has('id');
     if(hasCategoryId){
@@ -37,5 +62,6 @@ export class ProductListComponent implements OnInit {
     this.productService.getProductList(this.currentIdCategory).subscribe((data) => {
       this.products = data;
     });
+
   }
 }
